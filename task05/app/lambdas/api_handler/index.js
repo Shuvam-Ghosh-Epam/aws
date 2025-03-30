@@ -6,11 +6,20 @@ const dynamoDBClient = new DynamoDBClient();
 const TABLE_NAME = process.env.TABLE_NAME || "Events";
 
 export const handler = async (event) => {
-    console.log("Received event:", JSON.stringify(event, null, 2));
-
     try {
-        const inputEvent = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-        
+        console.log("Received event:", JSON.stringify(event, null, 2));
+
+        let inputEvent;
+        try {
+            inputEvent = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+        } catch (parseError) {
+            console.error("Error parsing event body:", parseError);
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Invalid JSON format in request body" })
+            };
+        }
+
         if (!inputEvent?.principalId || inputEvent?.content === undefined) {
             console.error("Validation failed: Missing required fields", inputEvent);
             return {
@@ -19,26 +28,34 @@ export const handler = async (event) => {
             };
         }
 
+        const eventId = uuidv4();
+        const createdAt = new Date().toISOString();
+
         const eventItem = {
-            id: uuidv4(),
+            id: eventId,
             principalId: Number(inputEvent.principalId),
-            createdAt: new Date().toISOString(),
+            createdAt,
             body: inputEvent.content
         };
 
         console.log("Saving to DynamoDB:", JSON.stringify(eventItem, null, 2));
 
-        await dynamoDBClient.send(new PutCommand({
+        const response = await dynamoDBClient.send(new PutCommand({
             TableName: TABLE_NAME,
             Item: eventItem,
         }));
-
         console.log("Saved successfully");
 
-        return {
+        console.log("DynamoDB Response:", response);
+
+        const responseObject = {
             statusCode: 201,
-            body: JSON.stringify({ statusCode: 201, event: eventItem })
+            body: JSON.stringify({statusCode : 201, event : eventItem})
         };
+
+        console.log("Final response:", JSON.stringify(responseObject, null, 2));
+        return responseObject;
+
     } catch (error) {
         console.error("Error processing request:", error);
         return {
