@@ -37,6 +37,7 @@
       "block_public_policy": true,
       "restrict_public_buckets": true
     },
+    "permissions_boundary": "",
     "tags": {}
   },
   "uuid_trigger": {

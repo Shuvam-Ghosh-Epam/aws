@@ -1,43 +1,28 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 
-// Get region from environment variables or use a default
-const REGION = 'eu-west-1';
+const REGION = process.env.AWS_REGION || 'eu-west-1';
 const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'uuid-storage';
 
-// Initialize S3 client with region
-const s3Client = new S3Client({ region: REGION });
+const s3 = new S3Client({ region: REGION });
 
-export const handler = async (event) => {
+export const handler = async () => {
     try {
-        // Generate 10 random UUIDs
-        const uuids = Array(10).fill().map(() => uuidv4());
+        const uuidList = Array.from({ length: 10 }, () => uuidv4());
+        const data = JSON.stringify({ ids: uuidList }, null, 4);
+        const timestamp = new Date().toISOString();
 
-        // Create JSON payload with the UUIDs
-        const payload = {
-            ids: uuids
+        const uploadParams = {
+            Bucket: BUCKET_NAME,
+            Key: timestamp,
+            Body: data,
+            ContentType: 'application/json',
         };
 
-        // Generate filename based on current timestamp
-        const timestamp = new Date().toISOString();
-        const filename = timestamp;
-
-        // Create the command for S3 upload
-        const command = new PutObjectCommand({
-            Bucket: BUCKET_NAME,
-            Key: filename,
-            Body: JSON.stringify(payload, null, 4),
-            ContentType: 'application/json'
-        });
-
-        // Upload the file to S3
-        await s3Client.send(command);
-
-        console.log(`Successfully uploaded UUIDs to S3: s3://${BUCKET_NAME}/${filename}`);
-
-        // No return statement needed for CloudWatch event triggers
-    } catch (error) {
-        console.error('Error:', error);
-        throw error;
+        await s3.send(new PutObjectCommand(uploadParams));
+        console.log(`UUIDs successfully stored in S3: s3://${BUCKET_NAME}/${timestamp}`);
+    } catch (err) {
+        console.error('Upload failed:', err);
+        throw err;
     }
 };
