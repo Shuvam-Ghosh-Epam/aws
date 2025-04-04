@@ -55,11 +55,11 @@ export const handler = async (event, context) => {
 // Helper functions for CORS headers
 function corsHeaders() {
   return {
-    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "*",
-    "Accept-Version": "*"
-   };
+    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': '*',
+    'Accept-Version': '*'
+  };
 }
 
 // Helper function for formatting responses
