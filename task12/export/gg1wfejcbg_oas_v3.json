@@ -1,9 +1,6 @@
 {
   "openapi": "3.0.1",
-  "info": {
-    "title": "task12_api",
-    "version": "2025-04-04T13:34:32Z"
-  },
+  "info": { "title": "task12_api", "version": "2025-04-04T13:34:32Z" },
   "servers": [
     {
       "url": "https://gg1wfejcbg.execute-api.eu-west-1.amazonaws.com/{basePath}",
@@ -17,6 +14,8 @@
   "paths": {
     "/reservations": {
       "get": {
+        "summary": "Get Reservations",
+        "description": "Fetches a list of all reservations.",
         "responses": {
           "200": {
             "description": "200 response",
@@ -129,7 +128,7 @@
           "type": "aws_proxy"
         }
       },
-     "options": {
+      "options": {
         "summary": "CORS Preflight",
         "description": "Handles CORS preflight requests to allow cross-origin requests.",
         "responses": {
@@ -750,17 +749,14 @@
         "in": "header",
         "x-amazon-apigateway-authtype": "cognito_user_pools",
         "x-amazon-apigateway-authorizer": {
-         "x-syndicate-cognito-userpool-names": 
-         ["${booking_userpool}"],
+          "x-syndicate-cognito-userpool-names": [
+            "${booking_userpool}"
+          ],
           "type": "cognito_user_pools"
         }
       }
     }
   },
-  "x-syndicate-openapi-tags": {
-    "run_id": "JAP-11",
-    "run_type": "stm",
-    "type": "user",
-    "user_id": "89e9b178"
-  }
+  "x-syndicate-openapi-tags": { "run_id": "JAP-11", "run_type": "stm", "type": "user", "user_id": "89e9b178" }
+  
 }
